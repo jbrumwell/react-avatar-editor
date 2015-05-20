@@ -17,10 +17,17 @@
     var DESKTOP_EVENTS = { down: 'onMouseDown', drag: 'onDragOver', drop: 'onDrop', move: 'mousemove', up: 'mouseup' }
     var DEVICE_EVENTS = TOUCH ? MOBILE_EVENTS : DESKTOP_EVENTS;
 
+    if (typeof Image === 'undefined') {
+      var Image = function() {};
+    }
+
     return React.createClass({
         propTypes: {
             scale: React.PropTypes.number,
-            image: React.PropTypes.string,
+            image: React.PropTypes.oneOfType([
+              React.PropTypes.string,
+              React.PropTypes.instanceOf(Image)
+            ]),
             border: React.PropTypes.number,
             width: React.PropTypes.number,
             height: React.PropTypes.number
@@ -88,10 +95,16 @@
         },
 
         loadImage: function (imageURL) {
-            var imageObj = new Image();
-            imageObj.onload = this.handleImageReady.bind(this, imageObj);
-            if (!this.isDataURL(imageURL)) imageObj.crossOrigin = 'anonymous';
-            imageObj.src = imageURL;
+            var imageObj;
+
+            if (imageUrl instanceof Image) {
+                this.handleImageReady(imageUrl);
+            } else {
+                imageOb = new Image();
+                imageObj.onload = this.handleImageReady.bind(this, imageObj);
+                if (!this.isDataURL(imageURL)) imageObj.crossOrigin = 'anonymous';
+                imageObj.src = imageURL;
+            }
         },
 
         componentDidMount: function () {
